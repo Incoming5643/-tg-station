@@ -32,6 +32,11 @@
 	icon_state = "tree_[rand(1, 6)]"
 	..()
 
+/obj/structure/flora/tree/festivus
+	name = "festivus pole"
+	icon = 'icons/obj/flora/pinetrees.dmi'
+	icon_state = "festivus_pole"
+	desc = "During last years Feats of Strength the Research Director was able to suplex this passing immobile rod into a planter."
 
 //grass
 /obj/structure/flora/grass
