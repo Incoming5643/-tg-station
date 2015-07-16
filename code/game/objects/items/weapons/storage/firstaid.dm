@@ -253,11 +253,28 @@
 
 /obj/item/weapon/storage/pill_bottle/dice/New()
 	..()
-	new /obj/item/weapon/dice/d4(src)
-	new /obj/item/weapon/dice(src)
-	new /obj/item/weapon/dice/d8(src)
-	new /obj/item/weapon/dice/d10(src)
-	new /obj/item/weapon/dice/d00(src)
-	new /obj/item/weapon/dice/d12(src)
-	new /obj/item/weapon/dice/d20(src)
+	var/list/include = list("1","2","4","6","8","10","00","12","20","100")
+	while(include.len > 7)
+		include -= pick(include)
+	if("1" in include)		new /obj/item/weapon/dice/d1(src)
+	if("2" in include)		new /obj/item/weapon/dice/d2(src)
+	if("4" in include)		new /obj/item/weapon/dice/d4(src)
+	if("6" in include)		new /obj/item/weapon/dice(src)
+	if("8" in include)		new /obj/item/weapon/dice/d8(src)
+	if("10" in include)		new /obj/item/weapon/dice/d10(src)
+	if("00" in include)		new /obj/item/weapon/dice/d00(src)
+	if("12" in include)		new /obj/item/weapon/dice/d12(src)
+	if("20" in include)		new /obj/item/weapon/dice/d20(src)
+	if("100" in include)	new /obj/item/weapon/dice/d100(src)
+
+/obj/item/weapon/storage/pill_bottle/dice/magic
+	name = "magic bag of dice"
+	desc = "They say games of chance are the devil's domain, they may not be wrong..."
+	icon = 'icons/obj/dice.dmi'
+	icon_state = "magicdicebag"
+
+/obj/item/weapon/storage/pill_bottle/dice/magic/remove_from_storage(obj/item/W, atom/new_location)
+	if(!..())	return
+	var/obj/item/weapon/dice/dX = W
+	dX.is_magic = 1
 

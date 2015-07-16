@@ -78,7 +78,7 @@
 	slot_flags = SLOT_BACK
 	force = 5
 	force_unwielded = 5
-	force_wielded = 20
+	force_wielded = 10
 	throwforce = 30
 	throw_range = 7
 	w_class = 5
@@ -89,8 +89,8 @@
 	var/datum/effect/effect/system/lightning_spread/s = new /datum/effect/effect/system/lightning_spread
 	s.set_up(5, 1, target.loc)
 	s.start()
-	target.take_organ_damage(0,30)
-	target.visible_message("<span class='danger'>[target.name] was shocked by the [src.name]!</span>", \
+	target.take_organ_damage(0,10)
+	target.visible_message("<span class='danger'>[target] was shocked by [src]!</span>", \
 		"<span class='userdanger'>You feel a powerful shock course through your body sending you flying!</span>", \
 		"<span class='italics'>You hear a heavy electrical crack!</span>")
 	var/atom/throw_target = get_edge_target_turf(target, get_dir(src, get_step_away(target, src)))
