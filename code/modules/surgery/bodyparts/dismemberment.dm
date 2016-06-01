@@ -10,7 +10,10 @@
 
 	var/obj/item/bodypart/affecting = H.get_bodypart("chest")
 	affecting.take_damage(Clamp(brute_dam/2, 15, 50), Clamp(burn_dam/2, 0, 50)) //Damage the chest based on limb's existing damage
-	H.visible_message("<span class='danger'><B>[H]'s [src.name] has been violently dismembered!</B></span>")
+	if(UNSALVAGABLELIMBS in H.dna.species.specflags)
+		H.visible_message("<span class='danger'><B>[H]'s [src.name] explodes in a shower of gore!</B></span>")
+	else
+		H.visible_message("<span class='danger'><B>[H]'s [src.name] has been violently dismembered!</B></span>")
 	H.emote("scream")
 	drop_limb()
 
@@ -98,7 +101,10 @@
 			O.transfer_to_limb(src, H)
 
 	update_icon_dropped()
-	src.loc = T
+	if(UNSALVAGABLELIMBS in H.dna.species.specflags)
+		qdel(src)
+	else
+		src.loc = T
 	H.update_health_hud() //update the healthdoll
 	H.update_body()
 	H.update_hair()

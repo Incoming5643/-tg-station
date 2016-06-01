@@ -187,9 +187,21 @@
 	default_color = "00FF90"
 	say_mod = "chirps"
 	eyes = "jelleyes"
-	specflags = list(MUTCOLORS,EYECOLOR,NOBLOOD,VIRUSIMMUNE,NODISMEMBER)
+	specflags = list(MUTCOLORS,EYECOLOR,NOBLOOD,VIRUSIMMUNE,UNSALVAGABLELIMBS)
 	meat = /obj/item/weapon/reagent_containers/food/snacks/meat/slab/human/mutant/slime
 	exotic_blood = "slimejelly"
+	var/datum/action/innate/regenerate_limbs/regenerate_limbs
+
+/datum/species/jelly/on_species_loss(mob/living/carbon/C)
+	if(regenerate_limbs)
+		regenerate_limbs.Remove(C)
+	..()
+
+/datum/species/jelly/on_species_gain(mob/living/carbon/C)
+	..()
+	if(ishuman(C))
+		regenerate_limbs = new
+		regenerate_limbs.Grant(C)
 
 /datum/species/jelly/spec_life(mob/living/carbon/human/H)
 	if(H.stat == DEAD) //can't farm slime jelly from a dead slime/jelly person indefinitely
@@ -215,6 +227,47 @@
 	if(chem.id == exotic_blood)
 		return 1
 
+/datum/action/innate/regenerate_limbs
+	name = "Regenerate Limbs"
+	check_flags = AB_CHECK_CONSCIOUS
+	button_icon_state = "slimesplit" //to do before merge: Proper icon
+	background_icon_state = "bg_alien"
+
+/datum/action/innate/regenerate_limbs/IsAvailable()
+	if(..())
+		var/mob/living/carbon/human/H = owner
+		var/list/limbs_to_heal = H.get_missing_limbs()
+		if(limbs_to_heal.len < 1)
+			return 0
+		for(var/datum/reagent/toxin/slimejelly/S in H.reagents.reagent_list)
+			if(S.volume >= 40)
+				return 1
+			return 0
+
+/datum/action/innate/regenerate_limbs/Activate()
+	var/mob/living/carbon/human/H = owner
+	var/list/limbs_to_heal = H.get_missing_limbs()
+	if(limbs_to_heal.len < 1)
+		H << "<span class='notice'>You feel intact enough as it is.</span>"
+		return
+
+	H << "<span class='notice'>You focus intently on your missing [limbs_to_heal.len >= 2 ? "limbs" : "limb"]...</span>"
+	for(var/datum/reagent/toxin/slimejelly/S in H.reagents.reagent_list)
+		if(S.volume >= 40*limbs_to_heal.len)
+			H.regenerate_limbs()
+			S.volume -= 40*limbs_to_heal.len
+			H << "<span class='notice'>...and after a moment you finish reforming!</span>"
+			return
+		else if(S.volume >= 40)//We can partially heal some limbs
+			while(S.volume >= 40)
+				var/healed_limb = pick(limbs_to_heal)
+				H.regenerate_limb(healed_limb)
+				limbs_to_heal -= healed_limb
+				S.volume -= 40
+			H << "<span class='warning'>...but there is not enough of you to fix everything! You must attain more mass to heal completely!</span>"
+			return
+	H << "<span class='warning'>...but there is not enough of you to go around! You must attain more mass to heal!</span>"
+
 /*
  SLIMEPEOPLE
 */
@@ -225,7 +278,7 @@
 	id = "slime"
 	default_color = "00FFFF"
 	darksight = 3
-	specflags = list(MUTCOLORS,EYECOLOR,HAIR,FACEHAIR,NOBLOOD,VIRUSIMMUNE,NODISMEMBER)
+	specflags = list(MUTCOLORS,EYECOLOR,HAIR,FACEHAIR,NOBLOOD,VIRUSIMMUNE,UNSALVAGABLELIMBS)
 	say_mod = "says"
 	eyes = "eyes"
 	hair_color = "mutcolor"
@@ -269,6 +322,14 @@
 	check_flags = AB_CHECK_CONSCIOUS
 	button_icon_state = "slimesplit"
 	background_icon_state = "bg_alien"
+
+/datum/action/innate/split_body/IsAvailable()
+	if(..())
+		var/mob/living/carbon/human/H = owner
+		for(var/datum/reagent/toxin/slimejelly/S in H.reagents.reagent_list)
+			if(S.volume >= 200)
+				return 1
+			return 0
 
 /datum/action/innate/split_body/Activate()
 	var/mob/living/carbon/human/H = owner

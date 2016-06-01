@@ -67,6 +67,7 @@
 #define NODISMEMBER		16
 #define NOHUNGER		17
 #define NOCRITDAMAGE	18
+#define UNSALVAGABLELIMBS	19
 
 #define FLYING	65536
 
